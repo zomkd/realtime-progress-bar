@@ -4,29 +4,30 @@ import ProgressBar from './components/ProgressBar.vue';
 import TaskBtn from './components/TaskBtn.vue';
 const data = ref()
 const inputData = ref()
-const connection = new WebSocket("ws://localhost:8000/ws")
 
-const BASE_URL = 'http://localhost:8000/';
-const BASE_URL_WS = 'ws://localhost:8000/';
+const BASE_URL = 'http://127.0.0.1:8000';
+const BASE_URL_WS = 'ws://127.0.0.1:8000';
 
 function submit()  {
   fetch(BASE_URL + '/task', {
     method: "POST",
     headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
           task_name: "task_1",
     }),
-  }).then(res => res.json()).then((res) => {
+  })
+  .then(res => res.json())
+  .then((res) => {
     const socket = new WebSocket(
-      BASE_URL_WS + `task/${res.celery_task_id}/`
+      BASE_URL_WS + `/task/${res.task_id}`
         );
         socket.onmessage = (event) => {
           const parsedEvent = JSON.parse(event.data);
           console.log(parsedEvent);
-          data.value = parsedEvent.progress * 100;
+          // data.value = parsedEvent.progress * 100;
+          data.value = parsedEvent
         };
 
         socket.onerror = (err) => {
@@ -38,27 +39,16 @@ function submit()  {
         socket.onopen = (event) => {
           console.log(event);
         };
-  })
-  connection.send(inputData.value)
+  }).catch(err => console.log(err))
 }
 
-
-onMounted(() => {
-
-  connection.onmessage = function(e){
-
-    data.value = e.data
-
-  }
-
-})
 
 </script>
 
 <template>
   <progress-bar :status="data"/>
 
-  <task-btn @clicked="submit" @keyup.enter="submit()" text="click!"/>
+  <task-btn @clicked="submit" text="click!"/>
   <!-- <h1>hello {{data}}</h1> -->
   <input type="text" v-model="inputData" @keyup.enter="submit()">
   <!-- <button @click="submit()">submit</button> -->
