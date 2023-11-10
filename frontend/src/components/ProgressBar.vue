@@ -1,22 +1,40 @@
 <script setup lang="ts">
+  import {computed} from 'vue'
   interface IProgressBarProps {
-    status: string,
+    data: {},
   }
 
   const props = withDefaults(defineProps<IProgressBarProps>(), {
-    status: '',
+    data: {},
   });
+  const width = computed(() => {
+    if (props.data.total === props.data.done) {
+      return 100
+    }
+    return Math.floor(100/props.data.total) * props.data.done 
+  })
+  const progressStyle = computed(() => {
+    return {
+  position: 'absolute',
+  left: 0,
+  top: 0,
+  bottom: 0,
+  width: `${width.value}%`,
+  background: '#326666',
+  transition: 'all .3s',
+}
+  })
 </script>
 
 <template>
-  <div class="counter">{{ props.status }}</div>
-<div class="progressbar">
-  <span class="progress"></span>
+  <div class="counter">{{ props.data }}</div>
+<div class="progressBar">
+  <span :style="progressStyle"></span>
 </div>
 </template>
 
 <style>
-.progressbar {
+.progressBar {
   position: relative;
   max-width: 500px;
   width: 100%;
@@ -31,7 +49,7 @@ span.progress {
   left: 0;
   top: 0;
   bottom: 0;
-  width: 0;
+  width: 50%;
   background: #326666;
   transition: all .3s;
 }

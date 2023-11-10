@@ -32,8 +32,8 @@ def create_task(self, task_name):
     n = 30
     for i in range(0, n):
         self.update_state(state='PROGRESS', meta={'done': i, 'total': n})
-        sleep(1)
-    return n
+        sleep(random.randint(1, 10))
+    self.update_state(state='SUCCESS', meta={'done': n, 'total': n})
 
 @app.get("/")
 def root():
@@ -52,9 +52,11 @@ async def websocket_endpoint(websocket: WebSocket, task_id):
     await websocket.accept()
     task_result = AsyncResult(task_id)
     print(task_result.state)
-    while True:
+    running = True
+    while running:
+        if task_result.state == 'SUCCESS':
+            running = False
         if task_result.state == 'PROGRESS':
-            # job did not start yet
             result = {
                 "task_id": task_id,
                 "task_status": task_result.state,

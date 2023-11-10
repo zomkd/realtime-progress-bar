@@ -41,16 +41,28 @@ function submit()  {
         };
   }).catch(err => console.log(err))
 }
-
-
 </script>
 
 <template>
-  <progress-bar :status="data"/>
-
-  <task-btn @clicked="submit" text="click!"/>
-  <!-- <h1>hello {{data}}</h1> -->
-  <input type="text" v-model="inputData" @keyup.enter="submit()">
-  <!-- <button @click="submit()">submit</button> -->
-  <RouterView />
+  <div class="container">
+    <div class="task-box">
+      <progress-bar :data="data?.task_result" />
+      <task-btn type="submit" @clicked="submit" text="click!"/>
+    </div>
+</div>
 </template>
+
+<style scoped>
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+} 
+.task-box {
+  width: 31.25rem
+}
+</style>
