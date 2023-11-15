@@ -1,21 +1,32 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, reactive, ref } from 'vue';
 import ProgressBar from './components/ProgressBar.vue';
-import TaskBtn from './components/TaskBtn.vue';
-const data = ref()
+import RpButton from './components/RpButton.vue';
+
+interface ITaskResult {
+  done: number,
+  total: number, 
+}
+
+interface ITaskStatus {
+    task_result: ITaskResult | null;
+}
+
+const taskStatus = reactive<ITaskStatus>({
+  task_result: null
+});
+
+const isClicked = ref<boolean>(false);
+const text = computed(() => isClicked.value ? 'Stop' : 'Start')
 
 const BASE_URL = 'http://127.0.0.1:8000';
 const BASE_URL_WS = 'ws://127.0.0.1:8000';
 
-function submit()  {
+const runTask = () => {
+  isClicked.value = !isClicked.value;
+
   fetch(BASE_URL + '/task', {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-          task_name: "task_1",
-    }),
+    method: 'GET',
   })
   .then(res => res.json())
   .then((res) => {
@@ -24,9 +35,7 @@ function submit()  {
         );
         socket.onmessage = (event) => {
           const parsedEvent = JSON.parse(event.data);
-          console.log(parsedEvent);
-          // data.value = parsedEvent.progress * 100;
-          data.value = parsedEvent
+          taskStatus.task_result = parsedEvent
         };
 
         socket.onerror = (err) => {
@@ -43,16 +52,25 @@ function submit()  {
 </script>
 
 <template>
-  <div class="container">
+  <div class="container" >
     <div class="task-box">
-      <progress-bar :data="data?.task_result" />
-      <task-btn type="submit" @clicked="submit" text="click!"/>
+      <div class="task-result">
+        <div v-if="taskStatus.task_result">
+          {{ taskStatus.task_result }}
+        </div>
+        <div v-else>
+          Run task!
+        </div>
+      </div>
+      <progress-bar :data="taskStatus.task_result" />
+      <div class="rp-button">
+      <rp-button type="submit" @clicked="runTask" :text="text" :class="isClicked ? 'stop-btn' : 'default-btn'"/>
+      </div>
     </div>
 </div>
 </template>
 
 <style scoped>
-
 .container {
   display: flex;
   flex-direction: column;
@@ -63,5 +81,9 @@ function submit()  {
 } 
 .task-box {
   width: 31.25rem
+}
+
+.rp-button {
+  margin-top: 5%;
 }
 </style>
