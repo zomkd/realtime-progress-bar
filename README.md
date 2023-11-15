@@ -21,3 +21,5 @@ git clone git@github.com:zomkd/realtime-progress-bar.git
 cd realtime-progress-bar
 docker-compose up --build -d
 ```
+
+App available on host: http://localhost:8080
