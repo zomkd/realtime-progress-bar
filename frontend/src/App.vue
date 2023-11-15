@@ -9,11 +9,11 @@ interface ITaskResult {
 }
 
 interface ITaskStatus {
-    task_result: ITaskResult | null;
+  taskResult: ITaskResult | null;
 }
 
 const taskStatus = reactive<ITaskStatus>({
-  task_result: null
+  taskResult: null
 });
 
 const isClicked = ref<boolean>(false);
@@ -35,7 +35,7 @@ const runTask = () => {
         );
         socket.onmessage = (event) => {
           const parsedEvent = JSON.parse(event.data);
-          taskStatus.task_result = parsedEvent
+          taskStatus.taskResult = parsedEvent.task_result
         };
 
         socket.onerror = (err) => {
@@ -55,14 +55,14 @@ const runTask = () => {
   <div class="container" >
     <div class="task-box">
       <div class="task-result">
-        <div v-if="taskStatus.task_result">
-          {{ taskStatus.task_result }}
+        <div v-if="taskStatus.taskResult">
+          {{ taskStatus.taskResult }}
         </div>
         <div v-else>
           Run task!
         </div>
       </div>
-      <progress-bar :data="taskStatus.task_result" />
+      <progress-bar :data="taskStatus.taskResult" />
       <div class="rp-button">
       <rp-button type="submit" @clicked="runTask" :text="text" :class="isClicked ? 'stop-btn' : 'default-btn'"/>
       </div>

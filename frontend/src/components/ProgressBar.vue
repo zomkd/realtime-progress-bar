@@ -8,32 +8,25 @@
   const props = withDefaults(defineProps<IProgressBarProps>(), {
     data: {},
   });
-//   const width = computed(() => {
-//     if (props.data.total === props.data.done) {
-//       return 100
-//     }
-//     return Math.floor(100/props.data.total) * props.data.done 
-//   })
-//   const progressStyle: any = computed(() => {
-//     return {
-//   position: 'absolute',
-//   left: 0,
-//   top: 0,
-//   bottom: 0,
-//   width: `${width.value}%`,
-//   background: '#326666',
-//   transition: 'all .3s',
-// }
-//   })
+  const width = computed(() => {
+    if (props.data) {
+      if (props.data.total === props.data.done) {
+      return 100
+    }
+    return Math.floor(100/props.data.total) * props.data.done 
+    }
+
+  })
+
 </script>
 
 <template>
 <div class="progressBar">
-  <span :style="progressStyle"></span>
+  <span class='progress' :style="{width: `${width}%`}"></span>
 </div>
 </template>
 
-<style>
+<style scoped>
 
 .progressBar {
   position: relative;
@@ -51,7 +44,7 @@ span.progress {
   left: 0;
   top: 0;
   bottom: 0;
-  width: 50%;
+  width: 0%;
   background: #326666;
   transition: all .3s;
 }

@@ -30,7 +30,7 @@
   </button>
 </template>
 
-<style>
+<style scoped>
 .default-btn {
     background-color: aquamarine;
     height: 3rem;
