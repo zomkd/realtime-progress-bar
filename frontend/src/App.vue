@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { onMounted,ref } from 'vue'
+import { ref } from 'vue'
 import ProgressBar from './components/ProgressBar.vue';
 import TaskBtn from './components/TaskBtn.vue';
 const data = ref()
-const inputData = ref()
 
 const BASE_URL = 'http://127.0.0.1:8000';
 const BASE_URL_WS = 'ws://127.0.0.1:8000';

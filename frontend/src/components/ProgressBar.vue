@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import {computed} from 'vue'
   interface IProgressBarProps {
-    data: {},
+    data: any,
   }
 
   const props = withDefaults(defineProps<IProgressBarProps>(), {
@@ -13,7 +13,7 @@
     }
     return Math.floor(100/props.data.total) * props.data.done 
   })
-  const progressStyle = computed(() => {
+  const progressStyle: any = computed(() => {
     return {
   position: 'absolute',
   left: 0,
