@@ -2,6 +2,8 @@
 
 Progress bar that shows the task completion status in real time, written using Vue 3, Fast API, Celery, Websockets.
 
+![Alt Text](https://imgflip.com/gif/87zpmx)
+
 #### Tech Stack:
 
  - Vue.js (3 version)
