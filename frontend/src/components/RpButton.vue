@@ -4,13 +4,13 @@
   interface IButtonProps {
     text: string,
     type: ButtonHTMLAttributes['type'],
-    class: string,
+    disabled: boolean,
   }
 
   const props = withDefaults(defineProps<IButtonProps>(), {
     text: '',
     type: 'submit',
-    class: 'default-btn'
+    disabled: false,
   });
 
   const emit = defineEmits(['clicked']);
@@ -22,8 +22,10 @@
 
 <template>
   <button
+    :disabled="props.disabled"
     :type="props.type"
-    :class="props.class"
+    class="default-btn"
+    :class="{'disabled' : disabled}"
     @click="handleClick"
   >
     {{ props.text }}
@@ -37,11 +39,8 @@
     width: 5rem;
     color: black
 }
-
-.stop-btn {
-  background-color: rgb(241, 122, 122);
-  height: 3rem;
-  width: 5rem;
-  color: black
+.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 </style>

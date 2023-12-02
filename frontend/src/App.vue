@@ -8,63 +8,73 @@ interface ITaskResult {
   total: number, 
 }
 
-interface ITaskStatus {
+type TaskStatus = string
+
+interface ITask {
   taskResult: ITaskResult | null;
+  taskStatus: TaskStatus | null;
 }
 
-const taskStatus = reactive<ITaskStatus>({
-  taskResult: null
-});
+const task = reactive<ITask>({
+  taskResult: null,
+  taskStatus: null
 
-const isClicked = ref<boolean>(false);
-const text = computed(() => isClicked.value ? 'Stop' : 'Start')
+});
 
 const BASE_URL = 'http://127.0.0.1:8000';
 const BASE_URL_WS = 'ws://127.0.0.1:8000';
 
-const runTask = () => {
-  isClicked.value = !isClicked.value;
+const socket = computed(() => {
+  if (taskID.value) {
+    return new WebSocket(
+      BASE_URL_WS + `/task/${taskID.value}`
+        );
+  }
+  return null;
+});
 
-  fetch(BASE_URL + '/task', {
+const btnText = 'START';
+const taskID = ref<string>('');
+
+const info = computed(() => task.taskStatus === 'SUCCESS' || task.taskStatus === null ? 'Run task!' : task.taskResult)
+const isClicked = computed(() => task.taskStatus === 'SUCCESS' || task.taskStatus === null ? false : true)
+
+const runTask = async () => {
+
+  await fetch(BASE_URL + '/task', {
     method: 'GET',
   })
   .then(res => res.json())
   .then((res) => {
-    const socket = new WebSocket(
-      BASE_URL_WS + `/task/${res.task_id}`
-        );
-        socket.onmessage = (event) => {
-          const parsedEvent = JSON.parse(event.data);
-          taskStatus.taskResult = parsedEvent.task_result
-        };
-
-        socket.onerror = (err) => {
-          console.log(err);
-        };
-        socket.onclose = (event) => {
-          console.log(event);
-        };
-        socket.onopen = (event) => {
-          console.log(event);
-        };
+    taskID.value = res.task_id;
+    socket.value!.onmessage = (event) => {
+      const parsedEvent = JSON.parse(event.data);
+      task.taskStatus = parsedEvent.task_status
+      task.taskResult = parsedEvent.task_result
+    };
+    socket.value!.onerror = (err) => {
+      console.log(err);
+    };
+    socket.value!.onclose = (event) => {
+      console.log(event);
+    };
+    socket.value!.onopen = (event) => {
+      console.log(event);
+    };
   }).catch(err => console.log(err))
 }
+
 </script>
 
 <template>
   <div class="container" >
     <div class="task-box">
       <div class="task-result">
-        <div v-if="taskStatus.taskResult">
-          {{ taskStatus.taskResult }}
-        </div>
-        <div v-else>
-          Run task!
-        </div>
+        <div> {{ info }}</div>
       </div>
-      <progress-bar :data="taskStatus.taskResult" />
+      <progress-bar :data="task.taskResult" />
       <div class="rp-button">
-      <rp-button type="submit" @clicked="runTask" :text="text" :class="isClicked ? 'stop-btn' : 'default-btn'"/>
+        <rp-button type="submit" @clicked="runTask" :text="btnText" :disabled="isClicked"/>
       </div>
     </div>
 </div>

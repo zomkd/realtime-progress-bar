@@ -33,10 +33,10 @@ def set_task():
 
 @celery.task(name="run_task", bind=True)
 def run_task(self):
-    n = 30
+    n = 10
     for i in range(0, n):
+        sleep(random.randint(1, 5))
         self.update_state(state='PROGRESS', meta={'done': i, 'total': n})
-        sleep(random.randint(1, 10))
     self.update_state(state='SUCCESS', meta={'done': n, 'total': n})
 
 @app.websocket("/task/{task_id}")
@@ -51,3 +51,10 @@ async def task_status_listiner(websocket: WebSocket, task_id: str):
             "task_result": task_result.result
         }
         await websocket.send_json(result)
+        
+    result = {
+            "task_id": task_id,
+            "task_status": task_result.state,
+            "task_result": task_result.result
+        }
+    await websocket.send_json(result)
